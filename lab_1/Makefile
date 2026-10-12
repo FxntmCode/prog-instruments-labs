@@ -15,10 +15,11 @@ help:
 	@echo make fullcheck    - lint, format check and typecheck
 	@echo make test         - run pytest
 	@echo make fulltest     - fullcheck and tests
+	@echo make precommit   - create pre-commit hooks
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
-	$(PYTHON) -m pip install ruff pyright pytest
+	$(PYTHON) -m pip install ruff pyright pytest pre-commit
 
 run:
 	$(PYTHON) $(MAIN)
@@ -44,3 +45,6 @@ test:
 	$(PYTHON) -m pytest $(TESTS)
 
 fulltest: fullcheck test
+
+precommit:
+	$(PYTHON) -m pre_commit install --config ../.pre-commit-config.yaml --hook-type pre-commit --hook-type pre-push
