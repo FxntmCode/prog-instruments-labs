@@ -1,80 +1,121 @@
-from typing import *
+import json
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Final
 
-x = 10
-Y = 20
-z = 30
-
-
-def BadFunction(a, b, c=None):
-    if c is None:
-        c = []
-    l = []
-    for i in range(len(a)):
-        if a[i] is None:
-            continue
-        l.append(a[i] * b)
-    if True:
-        pass
-    return l
+MAX_SIZE: Final = 100
+PASSING_GRADE: Final = 4.0
 
 
-class student_class:
-    def __init__(self, name, grades) -> None:
+@dataclass
+class Item:
+    title: str
+    price: float
+    tags: list[str] = field(default_factory=list)
+
+
+class Student:
+    def __init__(self, name: str, grades: list[int]) -> None:
         self.name = name
         self.grades = grades
-        self.Total = 0
+        self.total: int = 0
 
-    def Average(self):
-        try:
-            return sum(self.grades) / len(self.grades)
-        except:
-            pass
+    def average(self) -> float:
+        if not self.grades:
+            return 0.0
+        return sum(self.grades) / len(self.grades)
 
-    def very_long_method_name_that_does_too_many_things(
-        self,
-        first_argument,
-        second_argument,
-        third_argument,
-        fourth_argument,
-        fifth_argument,
-    ) -> str | None:
-        if first_argument and second_argument and third_argument and fourth_argument:
-            if fifth_argument:
-                return "deeply nested"
+    def get_name(self) -> str:
+        return self.name
+
+    def find_grade(self, value: int) -> int | None:
+        for grade in self.grades:
+            if grade == value:
+                return grade
         return None
 
 
-def process(data):
-    global x
-    x = x + 1
-    result = eval("1+1")
-    f = open("file.txt")
-    f.read()
-    d = {"a": 1, "b": 2}
-    1 + 2 + 3
-    for _k in d:
-        pass
-    return result
+class Graduate(Student):
+    def label(self, extra: int) -> str:
+        if self.average() + extra >= PASSING_GRADE:
+            return "high"
+        return "low"
 
 
-def add(a, b):
+def multiply_all(values: list[int], factor: int) -> list[int]:
+    return [value * factor for value in values]
+
+
+def add_numbers(a: int, b: int) -> int:
     return a + b
 
 
-def add(a, b):
-    return a - b
+def add_strings(a: str, b: str) -> str:
+    return a + b
 
 
-def main() -> int:
-    s = student_class("Ivan", [5, 4, 5])
-
-    def lambda_func(q):
-        return q * 2
-
-    if s.name == "Ivan":
-        pass
-    return 1
+def find_item(items: list[Item], title: str) -> Item | None:
+    for item in items:
+        if item.title == title:
+            return item
     return None
 
 
-main()
+def total_price(items: list[Item]) -> float:
+    return sum(item.price for item in items)
+
+
+def read_config(path: str) -> dict[str, str]:
+    with Path(path).open(encoding="utf-8") as file:
+        data: dict[str, str] = json.load(file)
+    return data
+
+
+def process(data: dict[str, int]) -> int:
+    value = data.get("key")
+    if value is None:
+        return 0
+    return value.bit_length()
+
+
+def double(number: int) -> int:
+    return number * 2
+
+
+def main() -> None:
+    student = Student("Ivan", [5, 4, 5])
+    print(student.average())
+    print(student.get_name().upper())
+
+    grade = student.find_grade(5)
+    if grade is not None:
+        print(grade + 1)
+
+    print(multiply_all([1, 2, 3], 2))
+    print(add_numbers(1, 2))
+    print(add_strings("1", "2"))
+
+    items = [Item("pen", 1.5, ["a"]), Item("book", 10.0)]
+    found = find_item(items, "pen")
+    if found is not None:
+        print(found.title.upper())
+        found.tags.append("x")
+    print(total_price(items))
+
+    try:
+        print(read_config("config.json"))
+    except (OSError, json.JSONDecodeError):
+        print("config not found")
+
+    print(process({"key": 5}))
+    print(double(3))
+
+    graduate = Graduate("Petr", [4, 5])
+    print(graduate.label(1))
+
+    if student.name == "Ivan":
+        print("match")
+
+
+if __name__ == "__main__":
+    main()
