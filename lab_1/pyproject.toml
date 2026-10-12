@@ -22,6 +22,7 @@ ignore = ["E501"]
 [tool.pyright]​
 include = [​"bad_code.py"]​
 pythonVersion = "3.12"​
-typeCheckingMode = "strict"​
-venvPath = "."​
-venv = ".venv"​
+typeCheckingMode = "standart"
+exclude = ["build", "generated"]
+strict = ["bad_code.py"]
+reportMissingTypeStubs = "error"​
