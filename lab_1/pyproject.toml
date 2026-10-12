@@ -19,10 +19,10 @@ fixable = ["ALL"]
 select = ["ALL"]
 ignore = ["E501"]
 
-[tool.pyright]​
-include = [​"bad_code.py"]​
-pythonVersion = "3.12"​
-typeCheckingMode = "standart"
-exclude = ["build", "generated"]
+[tool.pyright]
+include = ["bad_code.py", "tests"]
+exclude = ["build", "generated", ".venv", "venv"]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
 strict = ["bad_code.py"]
-reportMissingTypeStubs = "error"​
+reportMissingTypeStubs = "error"
