@@ -18,3 +18,10 @@ line-ending = "auto"
 fixable = ["ALL"]
 select = ["ALL"]
 ignore = ["E501"]
+
+[tool.pyright]​
+include = [​"bad_code.py"]​
+pythonVersion = "3.12"​
+typeCheckingMode = "strict"​
+venvPath = "."​
+venv = ".venv"​
