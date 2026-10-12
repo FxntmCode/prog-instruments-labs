@@ -1,2 +1,5 @@
 name: Lab 1 checks
+on: [push, pull-request]
+permissions:
+contents: read
 
