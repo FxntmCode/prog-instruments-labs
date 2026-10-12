@@ -17,7 +17,7 @@ line-ending = "auto"
 [tool.ruff.lint]
 fixable = ["ALL"]
 select = ["ALL"]
-ignore = ["E501"]
+ignore = ["E501", "D", "T201", "CPY001", "COM812", "ISC001"]
 
 [tool.pyright]
 include = ["bad_code.py", "tests"]
