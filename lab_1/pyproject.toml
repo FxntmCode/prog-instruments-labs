@@ -1,0 +1,12 @@
+[tool.ruff]​
+target-version = "py312"​
+line-length = 100​
+indent-width = 4​
+preview = false​
+
+​
+[tool.ruff.format]​
+quote-style = "double"​
+indent-style = "space"​
+skip-magic-trailing-comma = false​
+line-ending = "auto"​
