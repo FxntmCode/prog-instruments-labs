@@ -6,7 +6,7 @@ preview = false
 exclude = [".venv", "venv"]
 force-exclude = true
 fix = true
-unsafe-fixes = true 
+unsafe-fixes = true
 
 [tool.ruff.format]
 quote-style = "double"

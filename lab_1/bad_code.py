@@ -11,7 +11,7 @@ PASSING_GRADE: Final = 4.0
 class Item:
     title: str
     price: float
-    tags: list[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list[str])
 
 
 class Student:
