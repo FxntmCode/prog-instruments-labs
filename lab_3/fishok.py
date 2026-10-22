@@ -6,7 +6,7 @@ import requests
 
 
 BASE_URL = "https://www.fish-ok.ru"
-CATALOG_URL = (
+HOOKS_URL = (
     f"{BASE_URL}/catalog/kryuchki/"
     "kryuchki_cpinningiovye_flagman/"
 )
@@ -61,7 +61,7 @@ def save_to_csv(
     hooks: list[tuple[str, str, str]],
     filename: str,
 ) -> None:
-    """Сохраняет крючки в CSV"""
+    """Сохраняет товары в CSV"""
     with open(filename, "w", encoding="utf-8", newline="") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(["Название", "Ссылка", "Наличие"])
@@ -70,7 +70,7 @@ def save_to_csv(
 
 def main() -> None:
     catalogs = [
-        (CATALOG_URL, "hooks", 1, HOOK_PATTERN),
+        (HOOKS_URL, "hooks", 1, HOOK_PATTERN),
         (WOBBLERS_URL, "wobblers", 5, WOBBLER_PATTERN),
     ]
 
