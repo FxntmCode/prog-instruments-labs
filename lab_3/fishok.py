@@ -1,30 +1,84 @@
-import requests
-import re
 import csv
+import re
+from urllib.parse import urljoin
 
-r = requests.get("https://www.fish-ok.ru/catalog/kryuchki/kryuchki_cpinningiovye_flagman/", timeout=30)
+import requests
 
-with open("catalog.html", "w", encoding="utf-8") as file:
-    file.write(r.text)
 
-pattern = (r'<a\s+href="(/catalog/kryuchki/kryuchki_cpinningiovye_flagman/[0-9]+/)"'
+BASE_URL = "https://www.fish-ok.ru"
+CATALOG_URL = (
+    f"{BASE_URL}/catalog/kryuchki/"
+    "kryuchki_cpinningiovye_flagman/"
+)
+
+WOBBLERS_URL = f"{BASE_URL}/catalog/voblery/voblery_popery/"
+
+HOOK_PATTERN = re.compile(
+    r'<a\s+href="'
+    r'(/catalog/kryuchki/kryuchki_cpinningiovye_flagman/[0-9]+/)"'
     r'\s*>\s*<span>([^<]+)</span>\s*</a>'
-    r'.*?<span\s+class="value">([^<]+)</span>')
-hooks = re.findall(pattern, r.text, flags=re.DOTALL)
+    r'.*?<span\s+class="value">([^<]+)</span>',
+    flags=re.DOTALL,
+)
 
-with open("hooks.csv", "w", encoding="utf-8-sig", newline="") as file:
-    writer = csv.writer(file, delimiter=";")
-    writer.writerow(["Название", "Ссылка", "Наличие"])
+def download_html(url: str, params: dict | None = None) -> str:
+    """Скачивает HTML"""
+    response = requests.get(url, params=params, timeout=30)
+    response.raise_for_status()
+    return response.text
 
-    for link, name, item_value in hooks:
-        writer.writerow([
+
+def save_html(html: str, filename: str) -> None:
+    """Сохраняет HTML"""
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(html)
+
+
+def parse_hooks(html: str) -> list[tuple[str, str, str]]:
+    """Извлекает  название"""
+    matches = HOOK_PATTERN.findall(html)
+
+    return [
+        (
             name.strip(),
-            "https://www.fish-ok.ru" + link,
+            urljoin(BASE_URL, link),
             item_value.strip(),
-        ])
+        )
+        for link, name, item_value in matches
+    ]
 
-for link, name, item_value in hooks:
-    print(name.strip())
-    print(link)
-    print(item_value)
-    print()
+
+def save_to_csv(
+    hooks: list[tuple[str, str, str]],
+    filename: str,
+) -> None:
+    """Сохраняет крючки в CSV"""
+    with open(filename, "w", encoding="utf-8", newline="") as file:
+        writer = csv.writer(file, delimiter=";")
+        writer.writerow(["Название", "Ссылка", "Наличие"])
+        writer.writerows(hooks)
+
+
+def main() -> None:
+    html = download_html(CATALOG_URL)
+    save_html(html, "catalog.html")
+
+    hooks = parse_hooks(html)
+
+    if not hooks:
+        print("Товары не найдены. Проверьте сохранённый HTML.")
+        return
+
+    save_to_csv(hooks, "hooks.csv")
+
+    for name, link, item_value in hooks:
+        print(name)
+        print(link)
+        print(item_value)
+        print()
+
+    print(f"Сохранено товаров: {len(hooks)}")
+
+
+if __name__ == "__main__":
+    main()
