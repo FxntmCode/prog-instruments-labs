@@ -21,6 +21,14 @@ HOOK_PATTERN = re.compile(
     flags=re.DOTALL,
 )
 
+WOBBLER_PATTERN = re.compile(
+    r'<a\s+href="'
+    r'(/catalog/voblery/voblery_popery/[0-9]+/)"'
+    r'\s*>\s*<span>([^<]+)</span>\s*</a>'
+    r'.*?<span\s+class="value">([^<]+)</span>',
+    flags=re.DOTALL,
+)
+
 def download_html(url: str, params: dict | None = None) -> str:
     """Скачивает HTML"""
     response = requests.get(url, params=params, timeout=30)
@@ -34,17 +42,18 @@ def save_html(html: str, filename: str) -> None:
         file.write(html)
 
 
-def parse_hooks(html: str) -> list[tuple[str, str, str]]:
-    """Извлекает  название"""
-    matches = HOOK_PATTERN.findall(html)
-
+def parse_catalog(
+    html: str,
+    pattern: re.Pattern,
+) -> list[tuple[str, str, str]]:
+    """Извлекает  товары из каталога"""
     return [
         (
             name.strip(),
             urljoin(BASE_URL, link),
-            item_value.strip(),
+            availability.strip(),
         )
-        for link, name, item_value in matches
+        for link, name, availability in pattern.findall(html)
     ]
 
 
@@ -60,24 +69,44 @@ def save_to_csv(
 
 
 def main() -> None:
-    html = download_html(CATALOG_URL)
-    save_html(html, "catalog.html")
+    catalogs = [
+        (CATALOG_URL, "hooks", 1, HOOK_PATTERN),
+        (WOBBLERS_URL, "wobblers", 5, WOBBLER_PATTERN),
+    ]
 
-    hooks = parse_hooks(html)
+    for url, filename, max_pages, pattern in catalogs:
+        products = []
+        s_links = set()
 
-    if not hooks:
-        print("Товары не найдены. Проверьте сохранённый HTML.")
-        return
+        for page in range(1, max_pages + 1):
+            html = download_html(url, params={"PAGEN_1": page})
+            save_html(html, f"{filename}_page_{page}.html")
 
-    save_to_csv(hooks, "hooks.csv")
+            page_products = parse_catalog(html, pattern)
 
-    for name, link, item_value in hooks:
-        print(name)
-        print(link)
-        print(item_value)
-        print()
+            if not page_products:
+                print(f"{filename}: на странице {page} нет товаров")
+                break
 
-    print(f"Сохранено товаров: {len(hooks)}")
+            new_products = []
+
+            for name, link, availability in page_products:
+                if link not in s_links:
+                    s_links.add(link)
+                    new_products.append((name, link, availability))
+
+            if not new_products:
+                print(f"{filename}: новых товаров нет")
+                break
+
+            products.extend(new_products)
+
+        if not products:
+            print(f"{filename}: нечего сохранять")
+            continue
+
+        save_to_csv(products, f"{filename}.csv")
+        print(f"В {filename}.csv сохранено товаров: {len(products)}")
 
 
 if __name__ == "__main__":
