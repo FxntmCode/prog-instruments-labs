@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Скачивает .mp3 с Mixkit по заданному запросу и создаёт CSV-аннотацию
 с абсолютными и относительными путями к сохранённым файлам.
@@ -11,7 +10,12 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+import logging
 
+logger = logging.getLogger(__name__)
+
+def setup_logging() -> None:
+    logging.basicConfig(level=logging.INFO)
 
 class FileIterator:
     """Итерируемый класс: CSV или директория с .mp3."""
@@ -153,7 +157,9 @@ def download_mp3(url: str, selector: str, out_dir: Path) -> list[Path]:
     return files
 
 def main() -> None:
+    setup_logging()
     args = parse_args()
+    logger.info(f"Ищу музыку: {args.search_sound}")
     out_dir = Path(args.out_dir)
     csv_path = Path(args.csv_file)
     url = build_url(args.search_sound)
