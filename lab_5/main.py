@@ -149,6 +149,9 @@ def download_mp3(url: str, selector: str, out_dir: Path) -> list[Path]:
     """
     soup = fetch_html(url)
     urls = extract_audio_urls(soup, selector)
+
+    logger.info(f"Найдено {len(urls)} ссылок")
+
     if not urls:
         raise RuntimeError("Не найдено MP3")
     
@@ -175,8 +178,9 @@ def main() -> None:
         files = download_mp3(url, "data-audio-player-preview-url-value", out_dir)
         iterator = FileIterator(out_dir)
         write_csv_annotation(list(iterator), csv_path, out_dir)
-    except Exception as error:
-        print(f"Ошибка: {error}")
+    except Exception:
+        logger.exception("Не удалось скачать звук или создать CSV")
+        
 
 
 if __name__ == "__main__":
