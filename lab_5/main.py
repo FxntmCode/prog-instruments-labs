@@ -5,6 +5,7 @@
 
 import argparse
 import csv
+import logging.config
 import sys
 from pathlib import Path
 
@@ -15,13 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def setup_logging() -> None:
-    logging.basicConfig(level=logging.DEBUG,
-                        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-                        handlers= [logging.StreamHandler(),
-                                   logging.FileHandler("file.log", encoding="utf-8")
-
-        ],
-    )
+    logging.config.fileConfig("logging.conf")
 
 
 class FileIterator:
