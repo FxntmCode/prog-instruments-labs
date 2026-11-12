@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def setup_logging() -> None:
-    logging.basicConfig(level=logging.INFO,
+    logging.basicConfig(level=logging.DEBUG,
                         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
                         handlers= [logging.StreamHandler(),
                                    logging.FileHandler("file.log", encoding="utf-8")
@@ -167,6 +167,7 @@ def download_mp3(url: str, selector: str, out_dir: Path) -> list[Path]:
         with audio_file.open("wb") as f:
             f.write(resp.content)
         files.append(audio_file)
+        logger.debug(f"Скачан файл: {audio_file}")
     return files
 
 def main() -> None:
