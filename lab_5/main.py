@@ -12,11 +12,12 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 import logging
+import logging.config
 
 logger = logging.getLogger(__name__)
 
 def setup_logging() -> None:
-    logging.config.fileConfig("logging.conf")
+    logging.config.fileConfig("logging.conf", disable_existing_loggers=False)
 
 
 class FileIterator:
