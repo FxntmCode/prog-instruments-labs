@@ -142,6 +142,8 @@ def write_csv_annotation(
                 rel_p = Path(p.name)
             writer.writerow([p.name, str(abs_p), str(rel_p)])
 
+        logger.info(f"Создан CSV файл: {csv_path}")
+
 
 def download_mp3(url: str, selector: str, out_dir: Path) -> list[Path]:
     """
@@ -153,7 +155,8 @@ def download_mp3(url: str, selector: str, out_dir: Path) -> list[Path]:
     logger.info(f"Найдено {len(urls)} ссылок")
 
     if not urls:
-        raise RuntimeError("Не найдено MP3")
+        logger.warning("Не найдено MP3 на сайте")
+        return []
     
     out_dir.mkdir(exist_ok=True)
     files = []
@@ -176,6 +179,10 @@ def main() -> None:
 
     try:
         files = download_mp3(url, "data-audio-player-preview-url-value", out_dir)
+
+        if not files:
+            return 
+
         iterator = FileIterator(out_dir)
         write_csv_annotation(list(iterator), csv_path, out_dir)
     except Exception:
