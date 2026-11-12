@@ -15,7 +15,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 def setup_logging() -> None:
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO,
+                        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+                        )
+
 
 class FileIterator:
     """Итерируемый класс: CSV или директория с .mp3."""
